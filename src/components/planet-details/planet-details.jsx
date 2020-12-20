@@ -1,10 +1,9 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import SwapiService from '../../services/swapi.service.js';
 import Loader from '../loader';
 import Error from '../error';
 
 export default function PlanetDetails({planetId}) {
-  const swapiService = new SwapiService();
   const [planet, setPlanet] = useState({});
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
@@ -13,14 +12,18 @@ export default function PlanetDetails({planetId}) {
     setError(true)
   }
 
-  const getPlanet = (id) => {
-    swapiService.getPlanet(id)
-    .then((planet) => {
-      setPlanet(planet)
-      setLoaded(true)
-    })
-    .catch(onError)
-  }
+  const getPlanet = useCallback(
+    (id) => {
+      const swapiService = new SwapiService();
+      swapiService.getPlanet(id)
+      .then((planet) => {
+        setPlanet(planet)
+        setLoaded(true)
+      })
+      .catch(onError)
+      },
+    [],
+  )
 
   const setDefaultAvatar = (e) => {
     e.target.src = 'https://starwars-visualguide.com/assets/img/big-placeholder.jpg';
@@ -34,7 +37,7 @@ export default function PlanetDetails({planetId}) {
       setLoaded(false)
       setError(false)
     }
-  }, [planetId])
+  }, [planetId, getPlanet])
 
   return (
     <div className="person-details card">

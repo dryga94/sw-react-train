@@ -6,8 +6,6 @@ import Error from '../error';
 
 import './random-planet.css';
 export default function RandomPlanet() {
-  
-  const swapiService = new SwapiService();
 
   const defalutState = {
     name: null,
@@ -27,7 +25,8 @@ export default function RandomPlanet() {
   }
 
   const updatePlanet = useCallback(
-    () => {
+    (id) => {
+      const swapiService = new SwapiService();
       swapiService.getPlanet(id)
       .then((planet) => {
         setError(false)
@@ -36,17 +35,17 @@ export default function RandomPlanet() {
       })
       .catch(onError)
     },
-    [swapiService, id],
+    [],
   )
   useEffect(() => {
-    updatePlanet()
+    updatePlanet(id)
     const interval = setInterval(() => {
         setId(Math.floor(Math.random()*14) + 2)
     }, 3000);
     return () => {
       clearInterval(interval)
     };
-  }, [id]);
+  }, [id, updatePlanet]);
 
 
   return (

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import SwapiService from '../../services/swapi.service.js';
 import Loader from '../loader';
 
@@ -6,7 +6,8 @@ import Error from '../error';
 
 import './person-details.css';
 export default function PersonDetails({personId}) {
-  const swapiService = new SwapiService();
+
+  
   const [person, setPerson] = useState({});
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
@@ -15,14 +16,18 @@ export default function PersonDetails({personId}) {
     setError(true)
   }
 
-  const getPerson = (id) => {
-    swapiService.getPerson(id)
-    .then((person) => {
+  const getPerson = useCallback(
+    (id) => {
+      const swapiService = new SwapiService();
+      swapiService.getPerson(id)
+      .then((person) => {
       setPerson(person)
       setLoaded(true)
     })
     .catch(onError)
-  }
+    },
+    [],
+  )
 
   const setDefaultAvatar = (e) => {
     e.target.src = 'https://starwars-visualguide.com/assets/img/big-placeholder.jpg';
@@ -36,7 +41,7 @@ export default function PersonDetails({personId}) {
       setError(false)
       setLoaded(false)
     }
-  }, [personId])
+  }, [getPerson, personId])
 
   return (
     <div className="person-details card">

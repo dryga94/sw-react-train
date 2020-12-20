@@ -1,10 +1,10 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import SwapiService from '../../services/swapi.service.js';
 import Loader from '../loader';
 import Error from '../error';
 
 export default function StarShipDetails({starshipId}) {
-  const swapiService = new SwapiService();
+
   const [starships, setStarship] = useState({});
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false)
@@ -12,15 +12,19 @@ export default function StarShipDetails({starshipId}) {
   const onError = (err) => {
     setError(true)
   }
-
-  const getStarship = (id) => {
-    swapiService.getStarship(id)
-    .then((starships) => {
-      setStarship(starships)
-      setLoaded(true)
-    })
-    .catch(onError)
-  }
+   
+  const getStarship = useCallback(
+    (id) => {
+      const swapiService = new SwapiService();
+      swapiService.getStarship(id)
+      .then((starships) => {
+        setStarship(starships)
+        setLoaded(true)
+      })
+      .catch(onError)
+      },
+    [],
+  )
 
   const {name, model, manufacturer, starshipClass} = starships;
 
@@ -30,7 +34,7 @@ export default function StarShipDetails({starshipId}) {
       setLoaded(false)
       setError(false)
     }
-  }, [starshipId])
+  }, [starshipId, getStarship])
 
   const setDefaultAvatar = (e) => {
     e.target.src = 'https://starwars-visualguide.com/assets/img/big-placeholder.jpg';
