@@ -2,13 +2,11 @@ import React, {useState} from 'react';
 
 import AppHeader from '../app-header';
 import ItemList from '../item-list/item-list';
-import PersonDetails from '../person-details/person-details';
 import RandomPlanet from '../random-planet';
 import './app.css';
-import StarShipDetails from '../starship-details';
-import PlanetDetails from '../planet-details';
+import { ItemDetails } from '../item-details/item-details';
 export default function App() {
-  const [state, setState] = useState({currentList: 'people', id: '1'});
+  const [state, setState] = useState({currentList: 'people', id: '3'});
 
   const {id, currentList} = state;
 
@@ -29,13 +27,11 @@ export default function App() {
         <div className="col-4">
           <ItemList 
             onItemClick={onItemClick}
-            listName={state.currentList}
+            listName={currentList}
           />
         </div>
         <div className="col-8">
-          {currentList === 'people' && id && <PersonDetails personId={id}/>}
-          {currentList === 'starships' && id && <StarShipDetails starshipId={id}/>}
-          {currentList === 'planets' && id && <PlanetDetails planetId={id}/>}
+          <ItemDetails type={currentList} id={id}/>
         </div>
       </div>
     </div>

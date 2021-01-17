@@ -1,10 +1,10 @@
-.person-details {
+.item-details {
   flex-direction: row;
   padding: 16px;
   border-radius: 8px;
 }
 
-.person-details-image {
+.item-details-image {
   width: 200px;
   height: 200px;
   object-fit: cover;
@@ -12,10 +12,10 @@
   border-radius: 8px;
 }
 
-.person-details-info {
+.item-details-info {
   flex: 1;
 }
 
-.person-details .list-group-item {
+.item-details .list-group-item {
  padding: 8px;
 }
