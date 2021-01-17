@@ -1,40 +1,46 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState } from 'react';
+import { useQuery } from 'react-query';
 
 import AppHeader from '../app-header';
 import ItemList from '../item-list/item-list';
 import RandomPlanet from '../random-planet';
-import './app.css';
 import { ItemDetails } from '../item-details/item-details';
-export default function App() {
-  const [state, setState] = useState({currentList: 'people', id: '3'});
 
-  const {id, currentList} = state;
+import { Suspense } from '../ui/suspense/suspense';
+import { swapiService } from '../../services/swapi.service';
+import './app.css';
 
-  const onItemClick = (el) => {
-    setState({...state, id: el})
-  }
+const DEFAULT_APP_STATE = { currentList: 'people', id: '3' };
 
-  const onNavClick = (name) => {
-    setState({...state, currentList: name})
-  }
+export default function AppContainer() {
+  const [state, setState] = useState(DEFAULT_APP_STATE);
+  const { id, currentList } = state;
 
+  const onItemClick = useCallback((el) => {
+    setState({ ...state, id: el });
+  }, []);
+
+  const onNavClick = useCallback((name) => {
+    setState({ ...state, currentList: name });
+  }, []);
+
+  const { data, isLoading, error } = useQuery(
+    'starships',
+    swapiService.getAllStarships,
+  );
+
+  // Tab Navigation
+  // Tab Navigation Content
+  //    - Tab Content List
+  //        - Tab Content List Details
 
   return (
     <div className="container">
-      <AppHeader onNavClick={onNavClick}/>
-      <RandomPlanet />
-      <div className="row">
-        <div className="col-4">
-          <ItemList 
-            onItemClick={onItemClick}
-            listName={currentList}
-          />
-        </div>
-        <div className="col-8">
-          <ItemDetails type={currentList} id={id}/>
-        </div>
-      </div>
+      <AppHeader onNavClick={onNavClick} />
+      {/* <RandomPlanet /> */}
+       <Suspense loading={isLoading} error={error}>
+            <ItemList onItemClick={onItemClick} list={data} />
+          </Suspense>
     </div>
   );
 }
-

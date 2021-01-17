@@ -1,88 +1,31 @@
-import React, {useState, useEffect, useCallback} from 'react';
-
-import SwapiService from '../../services/swapi.service.js';
-import Loader from '../loader'
-import Error from '../error';
+import React, { useState } from 'react';
+import { ItemDetails } from '../item-details/item-details';
 
 import './item-list.css';
 
-export default function ItemList({onItemClick, listName}) {
-
-  const [list, setList] = useState(null);
-  const [loaded, setLoaded] = useState(false)
-  const [error, setError] = useState(false)
-
-  const onError = (err) => {
-    setError(true)
-  }
-  const getList = useCallback(
-    (listName) => {
-      const swapiService = new SwapiService();
-      switch (listName) {
-        case 'people':
-          swapiService.getAllPeople()
-          .then((peopleList) => {
-            setList(peopleList)
-            setLoaded(true)
-          })
-          .catch(onError)
-          break
-        case 'planets' :
-          swapiService.getAllPlanets()
-          .then((planetList) => {
-            setList(planetList)
-            setLoaded(true)
-          })
-          .catch(onError)
-          break
-        case 'starships':
-          swapiService.getAllStarships()
-          .then((starshipList) => {
-            setList(starshipList)
-            setLoaded(true)
-          })
-          .catch(onError)
-          break
-  
-          default :
-            setError(onError)
-  
-      }
-    },
-    [],
-  )
-  
-  const separateUrl = (url) => {
-    
-    const reg = /[0-9]*\/$/
-    const cutted = url.match(reg)[0].match(/[^/]*/)[0];
-    return cutted
-  }
-
-  useEffect(()=> {
-    getList(listName)
-    return function cleanup() {
-      setError(false)
-      setLoaded(false)
-    }
-  }, [listName, getList])
+export default function ItemList({ list = [] }) {
+  const [currentItem, setCurrentItem] = useState();
 
   return (
-    <div className="card item-list">
-      {loaded && !error && <ul className="list-group">
-          {list && list.map(({name, url})=> {
-            return (
-            <div key={name} 
-              className="list-group-item list-group-item-action"
-              onClick={()=> onItemClick(separateUrl(url))}
+    <div className="row">
+      <div className="col-4">
+        <div className="card item-list">
+          <ul className="list-group">
+            {list.map((item) => (
+              <div
+                key={item.id}
+                className="list-group-item list-group-item-action"
+                onClick={() => setCurrentItem(item)}
               >
-              {name}
-            </div>
-            )
-          })}
-        </ul>}
-      {!loaded && !error && <Loader />}
-      {error && <Error />}
+                {item.name}
+              </div>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div className="col-8">
+        {currentItem ? <ItemDetails item={currentItem} /> : <p>Go to hell</p>}
+      </div>
     </div>
-  )
+  );
 }
